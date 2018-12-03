@@ -1,0 +1,293 @@
+<!-- Arnav Kansal arnav.kansal@nyu.edu -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Game Greedy God</title>
+    <style>
+    	* { padding: 0; margin: 0; }
+    	canvas { background: #eee; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+
+<canvas id="game" width="480" height="480"></canvas>
+
+<script>
+	// JavaScript code goes here
+var canvas = document.getElementById("game");
+var context = canvas.getContext("2d");
+
+var background = new Image();
+background.src = "photos/galaxy.png";
+
+// Make sure the image is loaded first otherwise nothing will draw.
+background.onload = function(){
+    context.drawImage(background,0,0);   
+}
+
+var spaceship =
+{
+    color: "gray",
+    width: 8,
+    height: 22,
+    position:
+    {
+        x: 0,
+        y: 430
+    },
+    velocity:
+    {
+        x: 0.00,
+        y: -0.9
+    },
+    accelaration:
+    {
+    	x: 0,
+    	y: 0
+    },
+    angle: Math.PI / 4,
+    mass : 10,
+    engineOn: true,
+    crashed: false
+}
+
+var planet1 = {
+    color: "blue",
+    position:
+    {
+        x : 120,
+        y : 120
+    },
+    radius: 15,
+    mass : 500,
+    onFire : false,
+    timeSinceFire : 0
+}
+
+var planet2 = {
+    color: "red",
+    position:
+    {
+        x : 360,
+        y : 360
+    },
+    radius: 15,
+    mass : 500,
+    onFire : false,
+    timeSinceFire : 0
+}
+
+var target = {
+    color: "white",
+    position:
+    {
+        x : 240,
+        y : 240
+    },
+    radius: 10,
+}
+function drawTarget()
+{
+    context.save()
+    context.beginPath();
+    context.arc(
+        target.position.x,
+        target.position.y,
+            target.radius,
+           0, 2*Math.PI);
+    context.stroke();
+    context.fillStyle = target.color;
+    context.fill();
+    context.closePath()
+}
+
+var planets = [ planet1, planet2]
+var colors = ["rgb(255,255,0)", "rgb(255,215,0)", "rgb(255,165,0)", "rgb(255,140,0)", "rgb(255,69,0)", "rgb(0,0,0)"]
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+
+function drawPlanets()
+{
+	for(index in planets){
+        context.save()
+        context.beginPath();
+        var planet = planets[index];
+        if(planet.onFire == true){
+            context.arc(
+        planet.position.x,
+        planet.position.y,
+            planet.radius,
+           0, 2*Math.PI);
+        context.stroke();
+            planet.timeSinceFire -= 1;
+            if(planet.timeSinceFire == 0){
+                planet.onFire = false;
+            }
+            var indexC = getRandomInt(colors.length);
+            context.fillStyle = colors[indexC];
+            context.fill();
+            context.closePath()
+       }else{
+	       //context.fillStyle = planet.color;
+       }
+        
+    }
+}
+
+function drawSpaceship()
+{
+    context.save();
+    context.beginPath();
+    context.translate(spaceship.position.x, spaceship.position.y);
+    context.rotate(spaceship.angle);
+    context.rect(spaceship.width * -0.5, spaceship.height * -0.5, spaceship.width, spaceship.height);
+    context.fillStyle = spaceship.color;
+    context.fill();
+    context.closePath();
+
+    // Draw the flame if engine is on
+    if(spaceship.engineOn)
+    {
+        context.beginPath();
+        context.moveTo(spaceship.width * -0.5, spaceship.height * 0.5);
+        context.lineTo(spaceship.width * 0.5, spaceship.height * 0.5);
+        context.lineTo(0, spaceship.height * 0.5 + Math.random() * 10);
+        context.lineTo(spaceship.width * -0.5, spaceship.height * 0.5);
+        context.closePath();
+        context.fillStyle = "orange";
+        context.fill();
+    }
+    context.restore();
+}
+
+function updateAccelaration()
+{
+	spaceship.accelaration.x = 0;
+    spaceship.accelaration.y = 0;
+
+    for(index in planets){
+        var planet = planets[index];
+        var dist = distance(spaceship.position, planet.position);
+	    var acc = spaceship.mass * planet.mass / (dist * dist);
+	    var vec  = {
+		  x: planet.position.x - spaceship.position.x,
+		  y: planet.position.y - spaceship.position.y 
+	    }
+	   var vmod = Math.hypot(vec.x, vec.y);
+	   spaceship.accelaration.x += acc * vec.x / vmod;
+	   spaceship.accelaration.y += acc * vec.y / vmod;	
+    }
+}
+
+function distance(pta, ptb)
+{
+	return Math.hypot(pta.x - ptb.x, pta.y - ptb.y);
+}
+
+function drawCrash()
+{
+
+}
+
+function updateSpaceship()
+{
+	updateAccelaration();
+
+    spaceship.velocity.x += 0.05 * spaceship.accelaration.x;
+    spaceship.velocity.y += 0.05 * spaceship.accelaration.y;
+        
+    spaceship.position.x += 0.05 * spaceship.velocity.x;
+    spaceship.position.y += 0.05 * spaceship.velocity.y;
+
+    for(index in planets){
+        var planet = planets[index];
+        if(distance(planet.position, spaceship.position) <= planet.radius){
+            setTimeout(function(){
+            console.log("THIS IS");
+            }, 2000);
+            spaceship.crashed = true;
+            planet.onFire = true;
+            planet.timeSinceFire = 100;
+        }
+    }
+}
+
+function init(){
+    inputs = document.getElementById("inputs");
+    spaceship.velocity.x = Number(inputs.elements["xvel"].value);
+    spaceship.velocity.y = -Number(inputs.elements["yvel"].value);
+    if(Math.pow(spaceship.velocity.x, 2) + Math.pow(spaceship.velocity.y, 2) != 100){
+        spaceship.velocity.x = 6;
+        spaceship.velocity.y = -8;
+    }
+    let x1 = Number(inputs.elements["p1x"].value);
+    let y1 = Number(inputs.elements["p1y"].value);
+    let x2 = Number(inputs.elements["p2x"].value);
+    let y2 = Number(inputs.elements["p2y"].value);
+    let m1 = Number(inputs.elements["p1m"].value);
+    let m2 = Number(inputs.elements["p2m"].value);
+
+    if(x1 < 480 && x1 > 0){
+        planets[0].position.x = x1;
+    }
+    if(y1 < 480 && y1 > 0){
+        planets[0].position.y = 480 - y1;
+    }
+    if(x2 < 480 && x2 > 0){
+        planets[1].position.x = x2;
+    }
+    if(y2 < 480 && y2 > 0){
+        planets[1].position.y = 480 - y2;
+    }
+
+    if(m1 > 0 && m2 > 0 && m1 + m2 <= 1000){
+        planets[0].mass = m1;
+        planets[1].mass = m2;
+    }
+}
+
+function start()
+{
+    init();
+    draw();
+}
+function draw()
+{
+    // Clear entire screen
+    //context.clearRect(0, 0, canvas.width, canvas.height);
+    //context.drawImage(background,0,0);  
+
+    if(spaceship.crashed == false){
+        updateSpaceship();
+
+        // Begin drawing
+        drawSpaceship();
+    }
+    drawPlanets();
+    drawTarget();
+    /* other draw methods (to add later) */
+
+    requestAnimationFrame(draw);
+}
+
+
+</script>
+
+<FORM id="inputs">
+    X velocity: <input name="xvel" type="text" size="30"> </br>
+    Y velocity: <input name="yvel" type="text" size="30"> </br>
+    planet1 pos x: <input name="p1x" type="text" size="30"> </br>
+    planet1 pos y: <input name="p1y" type="text" size="30"> </br>
+    planet1 mass: <input name="p1m" type="text" size="30"> </br>
+    planet2 pos y: <input name="p2y" type="text" size="30"> </br>
+    planet2 pos x: <input name="p2x" type="text" size="30"> </br>
+    planet2 mass: <input name="p2m" type="text" size="30">
+</FORM>
+<button onclick="start()">submit</button>
+
+</body>
+</html>
