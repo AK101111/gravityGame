@@ -50,7 +50,7 @@ var spaceship =
     boost: false,
     boostTime: 0,
     maxBoostTime: 40,
-    timeSinceLastRun: 0,
+    timeSinceLastRun: -10000000,
     crashed: false
 }
 var planet1 = {
@@ -217,6 +217,8 @@ function distance(pta, ptb)
 function resetPosition(){
     spaceship.position.x = initPosition.x;
     spaceship.position.y = initPosition.y;
+    spaceship.velocity.x = spaceship.speed * Math.sin(spaceship.angle);
+    spaceship.velocity.y = -spaceship.speed * Math.cos(spaceship.angle);
 }
 // TODO: when spaceship hits boundaries or planets
 function drawCrash()
