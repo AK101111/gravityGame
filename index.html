@@ -27,6 +27,7 @@ var gravConst = 20
 var spaceshipSpeed = 10
 
 var planetRadius = 10
+var gameRun = 0
 
 var totalPlanetMass = 1000
 var planet1Mass = Math.floor(Math.random() * totalPlanetMass)
@@ -42,16 +43,23 @@ background.onload = function(){
     context.drawImage(background,0,0);
 }
 
+var initPosition = 
+{
+    x: Math.floor(Math.random() * (width - 2 * planetRadius) + planetRadius),
+    y: height - planetRadius
+}
+
 var spaceship =
 {
     color: "gray",
     width: 8,
     cylindricalHeight: 20,
     totalHeight: 40,
+    
     position:
     {
-        x: Math.floor(Math.random() * (width - 2 * planetRadius) + planetRadius),
-        y: height - planetRadius
+        x: initPosition.x,
+        y: initPosition.y
     },
     speed: spaceshipSpeed,
     angle: Math.random() * Math.PI - Math.PI / 2,
@@ -106,6 +114,7 @@ var target = {
     outerRadius: targetRadius,
     innerRadius: 4
 }
+
 function drawTarget()
 {
     context.save();
@@ -140,7 +149,7 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
 
-
+// when a planet is hit, it will keep burning and be visible till certain period of time within a game. if player starts a new part game, the burning planet might still be visible for the player to see the location of the planet.
 function drawPlanets()
 {
 	for(index in planets){
@@ -166,7 +175,6 @@ function drawPlanets()
        }else{
 	       //context.fillStyle = planet.color;
        }
-        
     }
 }
 
@@ -231,13 +239,51 @@ function distance(pta, ptb)
 	return Math.hypot(pta.x - ptb.x, pta.y - ptb.y);
 }
 
+function resetPosition(){
+    spaceship.position.x = initPosition.x;
+    spaceship.position.y = initPosition.y;
+}
+
+
+// TODO: when spaceship hits boundaries or planets
 function drawCrash()
 {
 
 }
 
+
+// TODO: update scoreboard and stop the game if hit target(result == true)
+// if this function is called the sixth time, stop the game without any effect
+function showResult(result){
+    // display outcome
+
+    if(result == true){
+        stopGame();
+        return ;
+    }
+
+    // wait for player to give velocity
+    // update velocity
+    
+    
+
+}
+
+function resetPartGame(hitTarget){
+    if(hitTarget == true){
+        showResult(true);
+    }else{
+        showResult(false);
+        drawCrash();
+        resetPosition();
+    }
+}
+
 function updateSpaceship()
 {
+    if(spaceship.position.x == target.position.x && spaceship.position.y == target.position.y){
+        resetPartGame(true);
+    }
 	updateAccelaration();
 
     spaceship.velocity.x += timeStep * spaceship.accelaration.x;
@@ -248,15 +294,18 @@ function updateSpaceship()
 
     spaceship.angle = Math.atan2(spaceship.velocity.x, -spaceship.velocity.y)
 
+    if(spaceship.position.x > canvas.width || spaceship.position.x < 0 || spaceship.position.y > canvas.height || spaceship.position.y < 0){
+        resetPartGame(false);
+    }
+
     for(index in planets){
         var planet = planets[index];
         if(distance(planet.position, spaceship.position) <= planet.radius){
-            setTimeout(function(){
-            console.log("THIS IS");
-            }, 2000);
-            spaceship.crashed = true;
+            resetPartGame(false);
+            //spaceship.crashed = true;
             planet.onFire = true;
             planet.timeSinceFire = 100;
+            break;
         }
     }
 }
@@ -287,6 +336,7 @@ function start()
     init();
     draw();
 }
+
 function draw()
 {
     // Clear entire screen
@@ -296,11 +346,9 @@ function draw()
     context.drawImage(background,0,0);
     drawTarget();
     drawPlanets();
-    if(spaceship.crashed == false){
-        updateSpaceship();
-        // Begin drawing
-        drawSpaceship();
-    }
+    updateSpaceship();
+    // Begin drawing
+    drawSpaceship();
     requestAnimationFrame(draw);
 }
 
