@@ -265,26 +265,26 @@ function declareResults(){
         alert('The game has ended. Game drawn.');
 }
 function statusUpdate(){
-    document.getElementById("roundNumber").innerHTML = "Round:" + (spaceship.numFirings+ 1);
+    document.getElementById("roundNumber").innerHTML = "Round:" + ((spaceship.numFirings) % numRounds + 1).toString();
     if(spaceship.numFirings <= numRounds){
-        document.getElementById("status1").innerHTML = "Hider";
-        document.getElementById("status2").innerHTML = "Seeker";
-        document.getElementById("status").innerHTML = "Player 2";
+        document.getElementById("status1").innerHTML = "Player 1: Hider";
+        document.getElementById("status2").innerHTML = "Player 2: Seeker";
+        document.getElementById("status").innerHTML = "Spaceship Captain: Player 2";
     }
     else if(spaceship.numFirings <= 2 * numRounds){
-        document.getElementById("status1").innerHTML = "Hider";
-        document.getElementById("status2").innerHTML = "Seeker";
-        document.getElementById("status").innerHTML = "Player 1";
+        document.getElementById("status1").innerHTML = "Player 1: Hider";
+        document.getElementById("status2").innerHTML = "Player 2: Seeker";
+        document.getElementById("status").innerHTML = "Spaceship Captain:Player 1";
     }
     else if(spaceship.numFirings <= 3 * numRounds){
-        document.getElementById("status1").innerHTML = "Seeker";
-        document.getElementById("status2").innerHTML = "Hider";
-        document.getElementById("status").innerHTML = "Player 1";
+        document.getElementById("status1").innerHTML = "Player 1: Seeker";
+        document.getElementById("status2").innerHTML = "Player 2: Hider";
+        document.getElementById("status").innerHTML = "Spaceship Captain:Player 1";
     }
     else{
-        document.getElementById("status1").innerHTML = "Seeker";
-        document.getElementById("status2").innerHTML = "Hider";
-        document.getElementById("status").innerHTML = "Player 2";
+        document.getElementById("status1").innerHTML = "Player 1: Seeker";
+        document.getElementById("status2").innerHTML = "Player 2: Hider";
+        document.getElementById("status").innerHTML = "Spaceship Captain:Player 2";
     }
 }
 function resetPartGame(hitTarget){
