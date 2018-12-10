@@ -81,18 +81,26 @@
             Spaceship Angle (-90 to 90): <input name="ang" type="number" min="-90" max="90" size="30" value=30> </br>
         </FORM>
         <input type="button" value="Submit" onclick="start()">
-        <input type="button" value="Boost" onclick="boost()">
+        <input type="button" value="Boost" onclick="boost()"> </br>
+        Boosts Remaining: <p id = "boosts"> 1 </p>
     </div>
     <div class="players">
         <div class="first-box"> 
-            <h2>Player 1</h2>
-            <p id="p1">580</p>
+            <h2>Player 1 Score (Hider)</h2>
+            <p id="p1ScoreHider"> - </p>
+        </div>
+        <div class="first-box"> 
+            <h2>Player 1 Score (Seeker)</h2>
+            <p id="p1ScoreSeeker"> - </p>
         </div>
         <div class="second-box">
-             <h2>Player 2</h2>
-            <p id="p2">5980</p>
+             <h2>Player 2 Score (Hider)</h2>
+            <p id="p2ScoreHider"> - </p>
             </div>
-
+        <div class="first-box"> 
+            <h2>Player 2 Score (Seeker)</h2>
+            <p id="p2ScoreSeeker"> - </p>
+        </div>
         </div>
 </body>
 </html>

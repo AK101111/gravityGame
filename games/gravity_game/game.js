@@ -250,6 +250,14 @@ function showResult(){
     // stopGame();
     // wait for player to give velocity
     // update velocity
+    if(spaceship.numFirings <= numRounds)
+        document.getElementById("p2ScoreSeeker").innerHTML = player2.seekScore;
+    else if(spaceship.numFirings <= 2 * numRounds)
+        document.getElementById("p1ScoreHider").innerHTML = player1.hideScore;
+    else if(spaceship.numFirings <= 3 * numRounds)
+        document.getElementById("p1ScoreSeeker").innerHTML = player1.seekScore;
+    else
+        document.getElementById("p2ScoreHider").innerHTML = player2.hideScore;
 }
 function declareResults(){
     //declare the final results, i.e., who won and by how much.
@@ -276,6 +284,23 @@ function resetPartGame(hitTarget){
 }
 function updateSpaceship()
 {
+    let targetDistance = distance(target.position, spaceship.position)
+    if(spaceship.numFirings <= numRounds){
+        if(player2.seekScore > targetDistance)
+            player2.seekScore = targetDistance;
+    }
+    else if(spaceship.numFirings <= 2 * numRounds){
+        if(player1.hideScore > targetDistance)
+            player1.hideScore = targetDistance;
+    }
+    else if(spaceship.numFirings <= 3 * numRounds){
+        if(player1.seekScore > targetDistance)
+            player1.seekScore = targetDistance;
+    }
+    else{
+        if(player2.hideScore > targetDistance)
+            player2.hideScore = targetDistance;
+    }
     if(spaceship.position.x == target.position.x && spaceship.position.y == target.position.y){
         resetPartGame(true);
     }
@@ -317,6 +342,7 @@ function init(){
         let m1 = Number(inputs.elements["p1m"].value);
         let m2 = totalPlanetMass - m1;
         spaceship.boostsRemaining = totalBoosts;
+        document.getElementById("boosts").innerHTML = totalBoosts;
         if(x1 < 0 || x1 > canvas.width){
             found = false;
             alert("Wrong planet 1 X coordinate");
@@ -398,6 +424,6 @@ function boost()
         spaceship.velocity.y += speedIncreaseY;
         spaceship.boost = true;
         spaceship.boostTime = 0;
-        spaceship.boostsRemaining--;
+        document.getElementById("boosts").innerHTML = --spaceship.boostsRemaining;
     }
 }
