@@ -7,13 +7,25 @@ var planetRadius = 10
 var gameRun = 0
 var totalPlanetMass = 1000
 var planet1Mass = Math.floor(Math.random() * totalPlanetMass)
+var totalBoosts = 1
 var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
 var background = new Image();
+var numRounds = 5
 background.src = "./photos/galaxy.png";
 // Make sure the image is loaded first otherwise nothing will draw.
 background.onload = function(){
     context.drawImage(background,0,0);
+}
+var player1 =
+{
+    hideScore: 10000,
+    seekScore: 10000
+}
+var player2 =
+{
+    hideScore: 10000,
+    seekScore: 10000
 }
 var initPosition =
 {
@@ -50,7 +62,9 @@ var spaceship =
     boost: false,
     boostTime: 0,
     maxBoostTime: 40,
+    boostsRemaining: totalBoosts,
     timeSinceLastRun: -10000000,
+    numFirings: 0,
     crashed: false
 }
 var planet1 = {
@@ -219,33 +233,31 @@ function resetPosition(){
     spaceship.position.y = initPosition.y;
     spaceship.velocity.x = spaceship.speed * Math.sin(spaceship.angle);
     spaceship.velocity.y = -spaceship.speed * Math.cos(spaceship.angle);
-}
-// TODO: when spaceship hits boundaries or planets
-function drawCrash()
-{
+    spaceship.numFirings++;
 }
 // TODO: update scoreboard and stop the game if hit target(result == true)
 // if this function is called the sixth time, stop the game without any effect
-function showResult(result){
+function showResult(){
     // display outcome
-// setString()
-// setScore()
-    if(result == true){
-        stopGame();
-        return ;
-    }
+    // setString()
+    // setScore()
+    // stopGame();
     // wait for player to give velocity
     // update velocity
-
-
+}
+function declareResults(){
+    //declare the final results, i.e., who won and by how much.
 }
 function resetPartGame(hitTarget){
     spaceship.timeSinceLastRun = -10000000;
-    if(hitTarget == true){
-        showResult(true);
-    }else{
-        showResult(false);
-        drawCrash();
+    showResult();
+    if(hitTarget == true)
+        spaceship.numFirings = Math.ceil(spaceship.numFirings / numRounds) * numRounds
+    if(spaceship.numFirings == numRounds * 4){
+        declareResults();
+    }
+    else{
+        if(spaceship.numFirings % numRounds == 0)
         resetPosition();
     }
 }
@@ -285,6 +297,8 @@ function init(){
     //spaceship.angle = (Math.PI / 180) * Number(inputs.elements["ang"].value);
     spaceship.velocity.x = spaceship.speed * Math.sin(spaceship.angle);
     spaceship.velocity.y = -spaceship.speed * Math.cos(spaceship.angle);
+    spaceship.numFirings++;
+    spaceship.boostsRemaining = totalBoosts;
     let x1 = Number(inputs.elements["p1x"].value);
     let y1 = Number(inputs.elements["p1y"].value);
     let x2 = Number(inputs.elements["p2x"].value);
@@ -320,11 +334,14 @@ function draw()
 }
 function boost()
 {
-    var speedBoost = 30;
-    let speedIncreaseX = speedBoost * spaceship.velocity.x / Math.hypot(spaceship.velocity.x, spaceship.velocity.y);
-    let speedIncreaseY = speedBoost * spaceship.velocity.y / Math.hypot(spaceship.velocity.x, spaceship.velocity.y);
-    spaceship.velocity.x += speedIncreaseX;
-    spaceship.velocity.y += speedIncreaseY;
-    spaceship.boost = true;
-    spaceship.boostTime = 0;
+    if(spaceship.boostsRemaining > 0) {
+        var speedBoost = 30;
+        let speedIncreaseX = speedBoost * spaceship.velocity.x / Math.hypot(spaceship.velocity.x, spaceship.velocity.y);
+        let speedIncreaseY = speedBoost * spaceship.velocity.y / Math.hypot(spaceship.velocity.x, spaceship.velocity.y);
+        spaceship.velocity.x += speedIncreaseX;
+        spaceship.velocity.y += speedIncreaseY;
+        spaceship.boost = true;
+        spaceship.boostTime = 0;
+        spaceship.boostsRemaining--;
+    }
 }
