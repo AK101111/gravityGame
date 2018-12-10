@@ -142,11 +142,8 @@ function drawPlanets()
         context.save();
         context.beginPath();
         var planet = planets[index];
-        if(planet.onFire == true){
+        if(spaceship.numFirings > 15 || spaceship.numFirings > 5 && spaceship.numFirings <= 10){
             planet.timeSinceFire -= 1;
-            if(planet.timeSinceFire == 0){
-                planet.onFire = false;
-            }
             context.arc(
             planet.position.x,
             planet.position.y,
@@ -251,7 +248,7 @@ function showResult(){
     // wait for player to give velocity
     // update velocity
     if(spaceship.numFirings <= numRounds)
-        document.getElementById("p2ScoreSeeker").innerHTML = player2.seekScore;
+        document.getElementById("p2ScoreSeeker").innerHTML =  player2.seekScore;
     else if(spaceship.numFirings <= 2 * numRounds)
         document.getElementById("p1ScoreHider").innerHTML = player1.hideScore;
     else if(spaceship.numFirings <= 3 * numRounds)
@@ -260,12 +257,35 @@ function showResult(){
         document.getElementById("p2ScoreHider").innerHTML = player2.hideScore;
 }
 function declareResults(){
-    //declare the final results, i.e., who won and by how much.
-    // should exit the game.
-    alert('The game has ended.');
+    if(player1.hideScore + player1.seekScore > player2.hideScore + player2.seekScore)
+        alert('The game has ended. Player 1 won.');
+    else if(player1.hideScore + player1.seekScore < player2.hideScore + player2.seekScore)
+        alert('The game has ended. Player 2 won.');
+    else
+        alert('The game has ended. Game drawn.');
 }
-function swapPlayers(bigRound){
-
+function statusUpdate(){
+    document.getElementById("roundNumber").innerHTML = "Round:" + (spaceship.numFirings+ 1);
+    if(spaceship.numFirings <= numRounds){
+        document.getElementById("status1").innerHTML = "Hider";
+        document.getElementById("status2").innerHTML = "Seeker";
+        document.getElementById("status").innerHTML = "Player 2";
+    }
+    else if(spaceship.numFirings <= 2 * numRounds){
+        document.getElementById("status1").innerHTML = "Hider";
+        document.getElementById("status2").innerHTML = "Seeker";
+        document.getElementById("status").innerHTML = "Player 1";
+    }
+    else if(spaceship.numFirings <= 3 * numRounds){
+        document.getElementById("status1").innerHTML = "Seeker";
+        document.getElementById("status2").innerHTML = "Hider";
+        document.getElementById("status").innerHTML = "Player 1";
+    }
+    else{
+        document.getElementById("status1").innerHTML = "Seeker";
+        document.getElementById("status2").innerHTML = "Hider";
+        document.getElementById("status").innerHTML = "Player 2";
+    }
 }
 function resetPartGame(hitTarget){
     spaceship.timeSinceLastRun = -10000000;
@@ -277,8 +297,7 @@ function resetPartGame(hitTarget){
         declareResults();
     }
     else{
-        if(spaceship.numFirings % numRounds == 0)
-            swapPlayers(spaceship.numFirings / numRounds);
+        statusUpdate();
         resetPosition();
     }
 }

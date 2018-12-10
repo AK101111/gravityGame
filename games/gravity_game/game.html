@@ -28,13 +28,20 @@
         ::hidden{color: #fff;}
         .players {
             padding-left:90px;
-            width:800px;left: 15%; top: 20%; transform: translate(90%, -150%);
+            width:800px;left: 15%; top: 20%; transform: translate(100%, -150%);
+            padding-top:100px
+            position:fixed;
+                font-family: sans-serif;
+        }
+        .status {
+            padding-left:90px;
+            width:800px; transform: translate(40%, -300%);
             padding-top:100px
             position:fixed;
                 font-family: sans-serif;
         }
         .first-box {
-              width:200px; 
+              width:250px; 
                     float:top; 
                           background: #3e3d3d; 
                                 height: 50px;
@@ -50,7 +57,7 @@
         }
 
         .second-box {
-              width:200px; 
+              width:250px; 
                     height: 50px; 
                           float:bottom; 
                             background: #3e3d3d;
@@ -72,35 +79,48 @@
     <div class = "form-wrap">        
         <FORM id="inputs">
             <h1> Hider Inputs </h1>
-            planet1 pos x (0 to 600): <input name="p1x" type="number" min="0" max="600" size="30" value=100> </br>
-            planet1 pos y (0 to 600): <input name="p1y" type="number" min="0" max="600" size="30" value=100> </br>
-            planet1 mass (1 to 999): <input name="p1m" type="number" min="1" max="999" size="30" value=500> </br>
-            planet2 pos x (0 to 600): <input name="p2x" type="number" min="0" max="600" size="30" value=300> </br>
-            planet2 pos y (0 to 600): <input name="p2y" type="number" min="0" max="600" size="30" value=300> </br>
+            <font color="#c0c0c0">planet1 pos x (0 to 600): </font><input name="p1x" type="number" min="0" max="600" size="30" value=100> </br>
+            <font color="#c0c0c0">planet1 pos y (0 to 600): </font><input name="p1y" type="number" min="0" max="600" size="30" value=100> </br>
+            <font color="#c0c0c0">planet1 mass (1 to 999): </font><input name="p1m" type="number" min="1" max="999" size="30" value=500> </br>
+            <font color="#c0c0c0">planet2 pos x (0 to 600): </font><input name="p2x" type="number" min="0" max="600" size="30" value=300> </br>
+            <font color="#c0c0c0">planet2 pos y (0 to 600): </font><input name="p2y" type="number" min="0" max="600" size="30" value=300> </br>
             <h1> Player Inputs </h1>
-            Spaceship Angle (-90 to 90): <input name="ang" type="number" min="-90" max="90" size="30" value=30> </br>
+            <font color="#c0c0c0">Spaceship Angle (-90 to 90): </font><input name="ang" type="number" min="-90" max="90" size="30" value=30> </br>
         </FORM>
         <input type="button" value="Submit" onclick="start()">
         <input type="button" value="Boost" onclick="boost()"> </br>
-        Boosts Remaining: <p id = "boosts"> 1 </p>
+        <font color="#c0c0c0"> Boosts Remaining: <p id = "boosts"> 1 </p> </font>
     </div>
     <div class="players">
         <div class="first-box"> 
-            <h2>Player 1 Score (Hider)</h2>
+            <font size=2>
+            <font color="#c0c0c0">
+            <h2>Player 1 Score (Hider)</h2></font>
             <p id="p1ScoreHider"> - </p>
         </div>
-        <div class="first-box"> 
-            <h2>Player 1 Score (Seeker)</h2>
+        <div class="first-box">
+            <font color="#c0c0c0">
+            <h2>Player 1 Score (Seeker)</h2></font>
             <p id="p1ScoreSeeker"> - </p>
         </div>
         <div class="second-box">
-             <h2>Player 2 Score (Hider)</h2>
+            <font color="#c0c0c0">
+            <h2>Player 2 Score (Hider)</h2></font>
             <p id="p2ScoreHider"> - </p>
             </div>
         <div class="first-box"> 
-            <h2>Player 2 Score (Seeker)</h2>
+            <font color="#c0c0c0">
+            <h2>Player 2 Score (Seeker)</h2></font>
             <p id="p2ScoreSeeker"> - </p>
+        </font>
         </div>
         </div>
+    <div class ="status">
+       <p id="roundNumber"> Round: 1 </p>
+       <p id="status1">  Player 1: Hider </p> 
+       <p id="status2">  Player 2: Seeker </p> 
+       <p id="status"> Spaceship Captain: Player 2 </p> 
+   </div>
+
 </body>
 </html>
