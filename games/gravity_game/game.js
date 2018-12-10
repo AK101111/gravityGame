@@ -12,7 +12,7 @@ var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
 var background = new Image();
 var numRounds = 5
-var goodToGo = false
+var goodToGo = 0
 background.src = "./photos/galaxy.png";
 // Make sure the image is loaded first otherwise nothing will draw.
 background.onload = function(){
@@ -257,12 +257,16 @@ function showResult(){
         document.getElementById("p2ScoreHider").innerHTML = player2.hideScore;
 }
 function declareResults(){
-    if(player1.hideScore + player1.seekScore > player2.hideScore + player2.seekScore)
-        alert('The game has ended. Player 1 won.');
-    else if(player1.hideScore + player1.seekScore < player2.hideScore + player2.seekScore)
+    if(player1.hideScore + player1.seekScore > player2.hideScore + player2.seekScore){
         alert('The game has ended. Player 2 won.');
-    else
+        $.get("../../dbman/saveScore.php", {gamename:"Gravity", playername:"player 2", score:player2.hideScore + player2.seekScore});
+    }
+    else if(player1.hideScore + player1.seekScore < player2.hideScore + player2.seekScore){
+        alert('The game has ended. Player 1 won.');
+        //$.get("../../dbman/saveScore.php", {gamename:"Gravity", playername:"player 1", score:player1.hideScore + player1.seekScore});
+    }else{
         alert('The game has ended. Game drawn.');
+    }
 }
 function statusUpdate(){
     document.getElementById("roundNumber").innerHTML = "Round:" + ((spaceship.numFirings) % numRounds + 1).toString();
@@ -289,8 +293,16 @@ function statusUpdate(){
 }
 function resetPartGame(hitTarget){
     spaceship.timeSinceLastRun = -10000000;
-    goodToGo = false;
+    goodToGo = 0;
     showResult();
+    inputs.elements["ang"].disabled = false;
+    if(spaceship.numFirings % (2 * numRounds) == 0) {
+        inputs.elements["p1x"].disabled = false;
+        inputs.elements["p2x"].disabled = false;
+        inputs.elements["p1y"].disabled = false;
+        inputs.elements["p2y"].disabled = false;
+        inputs.elements["p1m"].disabled = false;
+    }
     if(hitTarget == true)
         spaceship.numFirings = Math.ceil(spaceship.numFirings / numRounds) * numRounds
     if(spaceship.numFirings == numRounds * 4){
@@ -351,8 +363,12 @@ function updateSpaceship()
 }
 function init(){
     inputs = document.getElementById("inputs");
-    let found = true;
-    if(spaceship.numFirings % numRounds == 0)
+    let found = 2;
+    if(spaceship.numFirings % numRounds == 0 && spaceship.numFirings % (2 * numRounds) > 0){
+        spaceship.boostsRemaining = totalBoosts;
+        document.getElementById("boosts").innerHTML = totalBoosts;
+    }
+    if(spaceship.numFirings % (2 * numRounds) == 0 && goodToGo == 0)
     {
         let x1 = Number(inputs.elements["p1x"].value);
         let y1 = Number(inputs.elements["p1y"].value);
@@ -363,23 +379,23 @@ function init(){
         spaceship.boostsRemaining = totalBoosts;
         document.getElementById("boosts").innerHTML = totalBoosts;
         if(x1 < 0 || x1 > canvas.width){
-            found = false;
+            found = 0;
             alert("Wrong planet 1 X coordinate");
         }
         if(y1 < 0 || y1 > canvas.height){
-            found = false;
+            found = 0;
             alert("Wrong planet 1 Y coordinate");
         }
         if(x2 < 0 || x2 > canvas.width){
-            found = false;
+            found = 0;
             alert("Wrong planet 2 X coordinate");
         }
         if(y2 < 0 || y2 > canvas.height){
-            found = false;
+            found = 0;
             alert("Wrong planet 2 Y coordinate");
         }
         if(m1 < 1 || m1 > totalPlanetMass - 1){
-            found = false;
+            found = 0;
             alert("Wrong planet 1 mass");
         }
         if(found) {;
@@ -389,14 +405,26 @@ function init(){
             planet2.position.y = y2;
             planet1.mass = m1;
             planet2.mass = m2;
+            inputs.elements["p1x"].value = "";
+            inputs.elements["p1x"].disabled = true;
+            inputs.elements["p2x"].value = "";
+            inputs.elements["p2x"].disabled = true;
+            inputs.elements["p1y"].value = "";
+            inputs.elements["p1y"].disabled = true;
+            inputs.elements["p2y"].value = "";
+            inputs.elements["p2y"].disabled = true;
+            inputs.elements["p1m"].value = "";
+            inputs.elements["p1m"].disabled = true;
+            return 1;
         }
     }
     let ang = Number(inputs.elements["ang"].value);
     if(ang < -90 || ang > 90){
-        found = false;
+        found = 1;
         alert("Wrong angle");
     }
-    if(found) {
+    if(found == 2) {
+        inputs.elements["ang"].disabled = true;
         spaceship.angle = (Math.PI / 180) * ang;
         spaceship.velocity.x = spaceship.speed * Math.sin(spaceship.angle);
         spaceship.velocity.y = -spaceship.speed * Math.cos(spaceship.angle);
@@ -413,10 +441,10 @@ function drawBackground()
 }
 function start()
 {
-    if(goodToGo == false)
+    if(goodToGo != 2)
     {
         goodToGo = init()
-        if(goodToGo)
+        if(goodToGo == 2)
             draw();
     }
 }
