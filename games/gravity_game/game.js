@@ -1,61 +1,32 @@
-<!-- Arnav Kansal arnav.kansal@nyu.edu -->
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title>Game Greedy God</title>
-    <style>
-    	* { padding: 0; margin: 0; }
-    	canvas { background: #eee; display: block; margin: 0 auto; }
-    </style>
-</head>
-<body>
-
-<canvas id="game" width="480" height="480"></canvas>
-
-<script>
-	// JavaScript code goes here
-var height = 480
-var width = 480
-
-var timeStep = 0.2
-
+var timeStep = 0.15
+var timeBetweenRuns = 30
 var targetRadius = 10
-
 var gravConst = 20
-
 var spaceshipSpeed = 10
-
 var planetRadius = 10
 var gameRun = 0
-
 var totalPlanetMass = 1000
 var planet1Mass = Math.floor(Math.random() * totalPlanetMass)
-
 var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
-
 var background = new Image();
-background.src = "photos/galaxy.png";
-
+background.src = "./photos/galaxy.png";
 // Make sure the image is loaded first otherwise nothing will draw.
 background.onload = function(){
     context.drawImage(background,0,0);
 }
-
-var initPosition = 
+var initPosition =
 {
-    x: Math.floor(Math.random() * (width - 2 * planetRadius) + planetRadius),
-    y: height - planetRadius
+    x: Math.floor(Math.random() * (canvas.width - 2 * planetRadius) + planetRadius),
+    y: canvas.height - planetRadius
 }
-
 var spaceship =
 {
     color: "gray",
     width: 8,
     cylindricalHeight: 20,
     totalHeight: 40,
-    
+
     position:
     {
         x: initPosition.x,
@@ -74,47 +45,49 @@ var spaceship =
     	y: 0
     },
     engineOn: true,
+    fireLength: 10,
+    boostFireLength: 40,
+    boost: false,
+    boostTime: 0,
+    maxBoostTime: 40,
+    timeSinceLastRun: 0,
     crashed: false
 }
-
 var planet1 = {
     color: "blue",
     position:
     {
-        x : Math.floor(Math.random() * (width - 2 * planetRadius) + planetRadius),
-        y : Math.floor(Math.random() * (height - 2 * planetRadius) + planetRadius)
+        x : Math.floor(Math.random() * (canvas.width - 2 * planetRadius) + planetRadius),
+        y : Math.floor(Math.random() * (canvas.height - 2 * planetRadius) + planetRadius)
     },
     radius: planetRadius,
     mass : planet1Mass,
     onFire : false,
     timeSinceFire : 0
 }
-
 var planet2 = {
     color: "red",
     position:
     {
-        x : Math.floor(Math.random() * (width - 2 * planetRadius) + planetRadius),
-        y : Math.floor(Math.random() * (height - 2 * planetRadius) + planetRadius)
+        x : Math.floor(Math.random() * (canvas.width - 2 * planetRadius) + planetRadius),
+        y : Math.floor(Math.random() * (canvas.height - 2 * planetRadius) + planetRadius)
     },
     radius: planetRadius,
     mass : totalPlanetMass - planet1Mass,
     onFire : false,
     timeSinceFire : 0
 }
-
 var target = {
     innerColor: "red",
     outerColor: "white",
     position:
     {
-        x: Math.floor(Math.random() * (width - 2 * planetRadius) + planetRadius),
+        x: Math.floor(Math.random() * (canvas.width - 2 * planetRadius) + planetRadius),
         y: planetRadius
     },
     outerRadius: targetRadius,
     innerRadius: 4
 }
-
 function drawTarget()
 {
     context.save();
@@ -128,7 +101,6 @@ function drawTarget()
     context.fillStyle = target.outerColor;
     context.fill();
     context.closePath()
-
     context.save();
     context.beginPath();
     context.arc(
@@ -141,14 +113,11 @@ function drawTarget()
     context.fill();
     context.closePath();
 }
-
 var planets = [ planet1, planet2]
 var colors = ["rgb(255,255,0)", "rgb(255,215,0)", "rgb(255,165,0)", "rgb(255,140,0)", "rgb(255,69,0)", "rgb(0,0,0)"]
-
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
-
 // when a planet is hit, it will keep burning and be visible till certain period of time within a game. if player starts a new part game, the burning planet might still be visible for the player to see the location of the planet.
 function drawPlanets()
 {
@@ -156,18 +125,17 @@ function drawPlanets()
         context.save()
         context.beginPath();
         var planet = planets[index];
-        planet.onFire = true;
         if(planet.onFire == true){
-            context.arc(
-        planet.position.x,
-        planet.position.y,
-            planet.radius,
-           0, 2 * Math.PI);
-        context.stroke();
             planet.timeSinceFire -= 1;
             if(planet.timeSinceFire == 0){
                 planet.onFire = false;
             }
+            context.arc(
+            planet.position.x,
+            planet.position.y,
+            planet.radius,
+            0, 2 * Math.PI);
+            context.stroke();
             var indexC = getRandomInt(colors.length);
             context.fillStyle = colors[indexC];
             context.fill();
@@ -177,7 +145,6 @@ function drawPlanets()
        }
     }
 }
-
 function drawSpaceship()
 {
     context.save();
@@ -188,7 +155,6 @@ function drawSpaceship()
     context.fillStyle = spaceship.color;
     context.fill();
     context.closePath();
-
     context.save();
     context.beginPath();
     context.moveTo(spaceship.width * -0.5, spaceship.cylindricalHeight * -0.5);
@@ -198,7 +164,6 @@ function drawSpaceship()
     context.fillStyle = spaceship.color;
     context.fill();
     context.closePath();
-
     // Draw the flame if engine is on
     if(spaceship.engineOn)
     {
@@ -206,70 +171,74 @@ function drawSpaceship()
         context.beginPath();
         context.moveTo(spaceship.width * -0.5, spaceship.cylindricalHeight * 0.5);
         context.lineTo(spaceship.width * 0.5, spaceship.cylindricalHeight * 0.5);
-        context.lineTo(0, spaceship.cylindricalHeight * 0.5 + Math.random() * 10);
+        context.lineTo(0, spaceship.cylindricalHeight * 0.5 + Math.random() * spaceship.fireLength);
         context.lineTo(spaceship.width * -0.5, spaceship.cylindricalHeight * 0.5);
         context.fillStyle = "orange";
         context.fill();
         context.closePath();
     }
+    if(++spaceship.boostTime > spaceship.maxBoostTime)
+        spaceship.boost = false;
+    if(spaceship.boost)
+    {
+        context.save();
+        context.beginPath();
+        context.moveTo(spaceship.width * -0.5, spaceship.cylindricalHeight * 0.5);
+        context.lineTo(spaceship.width * 0.5, spaceship.cylindricalHeight * 0.5);
+        context.lineTo(0, spaceship.cylindricalHeight * 0.5 + Math.random() * spaceship.boostFireLength);
+        context.lineTo(spaceship.width * -0.5, spaceship.cylindricalHeight * 0.5);
+        context.fillStyle = "red";
+        context.fill();
+        context.closePath();
+    }
     context.restore();
 }
-
 function updateAccelaration()
 {
 	spaceship.accelaration.x = 0;
     spaceship.accelaration.y = 0;
-
     for(index in planets){
         var planet = planets[index];
         var dist = distance(spaceship.position, planet.position);
 	    var acc = gravConst * planet.mass / (dist * dist);
 	    var vec  = {
 		  x: planet.position.x - spaceship.position.x,
-		  y: planet.position.y - spaceship.position.y 
+		  y: planet.position.y - spaceship.position.y
 	    }
 	   var vmod = Math.hypot(vec.x, vec.y);
 	   spaceship.accelaration.x += acc * vec.x / vmod;
-	   spaceship.accelaration.y += acc * vec.y / vmod;	
+	   spaceship.accelaration.y += acc * vec.y / vmod;
     }
 }
-
 function distance(pta, ptb)
 {
 	return Math.hypot(pta.x - ptb.x, pta.y - ptb.y);
 }
-
 function resetPosition(){
     spaceship.position.x = initPosition.x;
     spaceship.position.y = initPosition.y;
 }
-
-
 // TODO: when spaceship hits boundaries or planets
 function drawCrash()
 {
-
 }
-
-
 // TODO: update scoreboard and stop the game if hit target(result == true)
 // if this function is called the sixth time, stop the game without any effect
 function showResult(result){
     // display outcome
-
+// setString()
+// setScore()
     if(result == true){
         stopGame();
         return ;
     }
-
     // wait for player to give velocity
     // update velocity
-    
-    
+
 
 }
-
 function resetPartGame(hitTarget){
+    spaceship.timeSinceLastRun = -10000000;
     if(hitTarget == true){
         showResult(true);
     }else{
@@ -278,38 +247,37 @@ function resetPartGame(hitTarget){
         resetPosition();
     }
 }
-
 function updateSpaceship()
 {
     if(spaceship.position.x == target.position.x && spaceship.position.y == target.position.y){
         resetPartGame(true);
     }
+    if(++spaceship.timeSinceLastRun > timeBetweenRuns)
+        resetPartGame(false);
 	updateAccelaration();
-
     spaceship.velocity.x += timeStep * spaceship.accelaration.x;
     spaceship.velocity.y += timeStep * spaceship.accelaration.y;
-
     spaceship.position.x += timeStep * spaceship.velocity.x;
     spaceship.position.y += timeStep * spaceship.velocity.y;
-
     spaceship.angle = Math.atan2(spaceship.velocity.x, -spaceship.velocity.y)
-
     if(spaceship.position.x > canvas.width || spaceship.position.x < 0 || spaceship.position.y > canvas.height || spaceship.position.y < 0){
-        resetPartGame(false);
+        if(spaceship.position.x < 9000)
+            spaceship.timeSinceLastRun = 0;
+        spaceship.position.x = 10000;
     }
-
     for(index in planets){
         var planet = planets[index];
         if(distance(planet.position, spaceship.position) <= planet.radius){
-            resetPartGame(false);
+            if(spaceship.position.x < 9000)
+                spaceship.timeSinceLastRun = 0;
+            spaceship.position.x = 10000;
             //spaceship.crashed = true;
             planet.onFire = true;
-            planet.timeSinceFire = 100;
+            planet.timeSinceFire = timeBetweenRuns;
             break;
         }
     }
 }
-
 function init(){
     inputs = document.getElementById("inputs");
     //spaceship.angle = (Math.PI / 180) * Number(inputs.elements["ang"].value);
@@ -322,7 +290,6 @@ function init(){
     let m1 = Number(inputs.elements["p1m"].value);
     let m2 = Number(inputs.elements["p2m"].value);
 }
-
 function drawBackground()
 {
     context.drawImage(background,0,0);
@@ -330,13 +297,11 @@ function drawBackground()
     drawPlanets();
     drawSpaceship();
 }
-
 function start()
 {
     init();
     draw();
 }
-
 function draw()
 {
     // Clear entire screen
@@ -351,19 +316,13 @@ function draw()
     drawSpaceship();
     requestAnimationFrame(draw);
 }
-
-</script>
-<body onLoad="drawBackground()">
-<FORM id="inputs">
-    Spaceship Angle: <input name="ang" type="text" size="30"> </br>
-    planet1 pos x: <input name="p1x" type="text" size="30"> </br>
-    planet1 pos y: <input name="p1y" type="text" size="30"> </br>
-    planet1 mass: <input name="p1m" type="text" size="30"> </br>
-    planet2 pos x: <input name="p2x" type="text" size="30"> </br>
-    planet2 pos y: <input name="p2y" type="text" size="30"> </br>
-    planet2 mass: <input name="p2m" type="text" size="30">
-</FORM>
-<button onclick="start()">submit</button>
-
-</body>
-</html>
+function boost()
+{
+    var speedBoost = 30;
+    let speedIncreaseX = speedBoost * spaceship.velocity.x / Math.hypot(spaceship.velocity.x, spaceship.velocity.y);
+    let speedIncreaseY = speedBoost * spaceship.velocity.y / Math.hypot(spaceship.velocity.x, spaceship.velocity.y);
+    spaceship.velocity.x += speedIncreaseX;
+    spaceship.velocity.y += speedIncreaseY;
+    spaceship.boost = true;
+    spaceship.boostTime = 0;
+}

@@ -1,0 +1,30 @@
+<!-- Arnav Kansal arnav.kansal@nyu.edu -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Game Greedy God</title>
+    <style>
+        * { padding: 0; margin: 0; }
+        canvas { background: #eee; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+<canvas id="game" width="600" height="600"></canvas>
+<script src="game.js"></script>
+
+<body onLoad="drawBackground()">
+<FORM id="inputs">
+    Spaceship Angle: <input name="ang" type="text" size="30"> </br>
+    planet1 pos x: <input name="p1x" type="text" size="30"> </br>
+    planet1 pos y: <input name="p1y" type="text" size="30"> </br>
+    planet1 mass: <input name="p1m" type="text" size="30"> </br>
+    planet2 pos x: <input name="p2x" type="text" size="30"> </br>
+    planet2 pos y: <input name="p2y" type="text" size="30"> </br>
+    planet2 mass: <input name="p2m" type="text" size="30">
+</FORM>
+<button onclick="start()">Submit</button>
+<button onclick="boost()">Boost</button>
+
+</body>
+</html>
