@@ -13,18 +13,37 @@
 <canvas id="game" width="600" height="600"></canvas>
 <script src="game.js"></script>
 
-<body onLoad="drawBackground()">
-<FORM id="inputs">
-    Spaceship Angle: <input name="ang" type="text" size="30"> </br>
-    planet1 pos x: <input name="p1x" type="text" size="30"> </br>
-    planet1 pos y: <input name="p1y" type="text" size="30"> </br>
-    planet1 mass: <input name="p1m" type="text" size="30"> </br>
-    planet2 pos x: <input name="p2x" type="text" size="30"> </br>
-    planet2 pos y: <input name="p2y" type="text" size="30"> </br>
-    planet2 mass: <input name="p2m" type="text" size="30">
-</FORM>
-<button onclick="start()">Submit</button>
-<button onclick="boost()">Boost</button>
+<style>
+    
+        *{margin: 0; padding: 0;}
+        body{background: #ecf1f4; font-family: sans-serif;}
+        .form-wrap{ width: 240px; background: #3e3d3d; padding: 40px 20px; box-sizing: border-box; position: fixed; left: 15%; top: 50%; transform: translate(-60%, -60%);}
+        h1{text-align: center; color: #fff; font-weight: normal; margin-bottom: 10px;}
+        
+        input{width: 100%; background: none; border: 1px solid #fff; border-radius: 3px; padding: 6px 15px; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; color: #fff;}
+        
+        input[type="button"]{ background: #ffffff; border: 0; cursor: pointer; color: #000000;}
+        input[type="button"]:hover{ background: #ffffff; transition: .6s;}
+        
+        ::placeholder{color: #fff;}
+    </style>
 
+<body onLoad="drawBackground()">
+
+    <div class = "form-wrap">        
+        <FORM id="inputs">
+            <h1> Hider Inputs </h1>
+            planet1 pos x: <input name="p1x" type="text" size="30" placeholder=100> </br>
+            planet1 pos y: <input name="p1y" type="text" size="30" placeholder=100> </br>
+            planet1 mass: <input name="p1m" type="text" size="30" placeholder=500> </br>
+            planet2 pos x: <input name="p2x" type="text" size="30" placeholder=300> </br>
+            planet2 pos y: <input name="p2y" type="text" size="30" placeholder=300> </br>
+            <h1> Player Inputs </h1>
+            Spaceship Angle: <input name="ang" type="text" size="30" placeholder=30> </br>
+        </FORM>
+        <input type="button" value="Submit" onclick="start()">
+        <input type="button" value="Boost" onclick="boost()">
+    </div>
+    <div id="score1"></div>
 </body>
 </html>

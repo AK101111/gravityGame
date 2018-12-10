@@ -48,7 +48,7 @@ jQuery(document).ready(function($) {
         var modeChoices = ['PvP','PvAI'];
         newSelect('Game Mode',modeChoices,'modeSelect');
         newTextBox('AI Placement Seed (blank for random)','seed');
-        newWindowBtn(816,616,"games/gravity_game/game.html", ['modeSelect', 'seed']);
+        newWindowBtn(screen.availWidth, screen.availHeight,"games/gravity_game/game.html", ['modeSelect', 'seed']);
     </script>
 </body>
 </html>
