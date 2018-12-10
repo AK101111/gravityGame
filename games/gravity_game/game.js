@@ -1,5 +1,5 @@
 var timeStep = 0.15
-var timeBetweenRuns = 30
+var timeBetweenRuns = 0
 var targetRadius = 10
 var gravConst = 20
 var spaceshipSpeed = 10
@@ -12,6 +12,7 @@ var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
 var background = new Image();
 var numRounds = 5
+var goodToGo = false
 background.src = "./photos/galaxy.png";
 // Make sure the image is loaded first otherwise nothing will draw.
 background.onload = function(){
@@ -233,7 +234,6 @@ function resetPosition(){
     spaceship.position.y = initPosition.y;
     spaceship.velocity.x = spaceship.speed * Math.sin(spaceship.angle);
     spaceship.velocity.y = -spaceship.speed * Math.cos(spaceship.angle);
-    spaceship.numFirings++;
 }
 // TODO: update scoreboard and stop the game if hit target(result == true)
 // if this function is called the sixth time, stop the game without any effect
@@ -247,9 +247,15 @@ function showResult(){
 }
 function declareResults(){
     //declare the final results, i.e., who won and by how much.
+    // should exit the game.
+    alert('The game has ended.');
+}
+function swapPlayers(bigRound){
+
 }
 function resetPartGame(hitTarget){
     spaceship.timeSinceLastRun = -10000000;
+    goodToGo = false;
     showResult();
     if(hitTarget == true)
         spaceship.numFirings = Math.ceil(spaceship.numFirings / numRounds) * numRounds
@@ -258,6 +264,7 @@ function resetPartGame(hitTarget){
     }
     else{
         if(spaceship.numFirings % numRounds == 0)
+            swapPlayers(spaceship.numFirings / numRounds);
         resetPosition();
     }
 }
@@ -287,7 +294,7 @@ function updateSpaceship()
             spaceship.position.x = 10000;
             //spaceship.crashed = true;
             planet.onFire = true;
-            planet.timeSinceFire = timeBetweenRuns;
+            planet.timeSinceFire = 30;
             break;
         }
     }
@@ -304,7 +311,8 @@ function init(){
     let x2 = Number(inputs.elements["p2x"].value);
     let y2 = Number(inputs.elements["p2y"].value);
     let m1 = Number(inputs.elements["p1m"].value);
-    let m2 = Number(inputs.elements["p2m"].value);
+    let m2 = 1000 - m1;
+    // TODO: Set Values
 }
 function drawBackground()
 {
@@ -315,6 +323,7 @@ function drawBackground()
 }
 function start()
 {
+    goodToGo = true;
     init();
     draw();
 }
@@ -330,7 +339,8 @@ function draw()
     updateSpaceship();
     // Begin drawing
     drawSpaceship();
-    requestAnimationFrame(draw);
+    if(goodToGo)
+        requestAnimationFrame(draw);
 }
 function boost()
 {
