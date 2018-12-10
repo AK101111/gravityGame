@@ -25,7 +25,7 @@
         input[type="button"]{ background: #ffffff; border: 0; cursor: pointer; color: #000000;}
         input[type="button"]:hover{ background: #ffffff; transition: .6s;}
         
-        ::placeholder{color: #fff;}
+        ::hidden{color: #fff;}
     </style>
 
 <body onLoad="drawBackground()">
@@ -33,13 +33,13 @@
     <div class = "form-wrap">        
         <FORM id="inputs">
             <h1> Hider Inputs </h1>
-            planet1 pos x: <input name="p1x" type="text" size="30" placeholder=100> </br>
-            planet1 pos y: <input name="p1y" type="text" size="30" placeholder=100> </br>
-            planet1 mass: <input name="p1m" type="text" size="30" placeholder=500> </br>
-            planet2 pos x: <input name="p2x" type="text" size="30" placeholder=300> </br>
-            planet2 pos y: <input name="p2y" type="text" size="30" placeholder=300> </br>
+            planet1 pos x (0 to 600): <input name="p1x" type="number" min="0" max="600" size="30" value=100> </br>
+            planet1 pos y (0 to 600): <input name="p1y" type="number" min="0" max="600" size="30" value=100> </br>
+            planet1 mass (1 to 999): <input name="p1m" type="number" min="1" max="999" size="30" value=500> </br>
+            planet2 pos x (0 to 600): <input name="p2x" type="number" min="0" max="600" size="30" value=300> </br>
+            planet2 pos y (0 to 600): <input name="p2y" type="number" min="0" max="600" size="30" value=300> </br>
             <h1> Player Inputs </h1>
-            Spaceship Angle: <input name="ang" type="text" size="30" placeholder=30> </br>
+            Spaceship Angle (-90 to 90): <input name="ang" type="number" min="-90" max="90" size="30" value=30> </br>
         </FORM>
         <input type="button" value="Submit" onclick="start()">
         <input type="button" value="Boost" onclick="boost()">

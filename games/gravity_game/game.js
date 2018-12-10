@@ -46,7 +46,7 @@ var spaceship =
         y: initPosition.y
     },
     speed: spaceshipSpeed,
-    angle: Math.random() * Math.PI - Math.PI / 2,
+    angle: 0,//Math.random() * Math.PI - Math.PI / 2,
     velocity:
     {
         x: 0,
@@ -127,6 +127,7 @@ function drawTarget()
     context.fillStyle = target.innerColor;
     context.fill();
     context.closePath();
+    context.restore();
 }
 var planets = [ planet1, planet2]
 var colors = ["rgb(255,255,0)", "rgb(255,215,0)", "rgb(255,165,0)", "rgb(255,140,0)", "rgb(255,69,0)", "rgb(0,0,0)"]
@@ -136,8 +137,9 @@ function getRandomInt(max) {
 // when a planet is hit, it will keep burning and be visible till certain period of time within a game. if player starts a new part game, the burning planet might still be visible for the player to see the location of the planet.
 function drawPlanets()
 {
+    
 	for(index in planets){
-        context.save()
+        context.save();
         context.beginPath();
         var planet = planets[index];
         if(planet.onFire == true){
@@ -154,11 +156,13 @@ function drawPlanets()
             var indexC = getRandomInt(colors.length);
             context.fillStyle = colors[indexC];
             context.fill();
-            context.closePath()
-       }else{
+        }else{
 	       //context.fillStyle = planet.color;
-       }
+        }
+        context.closePath();
+        context.restore();
     }
+
 }
 function drawSpaceship()
 {
@@ -301,18 +305,59 @@ function updateSpaceship()
 }
 function init(){
     inputs = document.getElementById("inputs");
-    //spaceship.angle = (Math.PI / 180) * Number(inputs.elements["ang"].value);
-    spaceship.velocity.x = spaceship.speed * Math.sin(spaceship.angle);
-    spaceship.velocity.y = -spaceship.speed * Math.cos(spaceship.angle);
-    spaceship.numFirings++;
-    spaceship.boostsRemaining = totalBoosts;
-    let x1 = Number(inputs.elements["p1x"].value);
-    let y1 = Number(inputs.elements["p1y"].value);
-    let x2 = Number(inputs.elements["p2x"].value);
-    let y2 = Number(inputs.elements["p2y"].value);
-    let m1 = Number(inputs.elements["p1m"].value);
-    let m2 = 1000 - m1;
-    // TODO: Set Values
+    let found = true;
+    if(spaceship.numFirings % numRounds == 0)
+    {
+        let x1 = Number(inputs.elements["p1x"].value);
+        let y1 = Number(inputs.elements["p1y"].value);
+        let x2 = Number(inputs.elements["p2x"].value);
+        let y2 = Number(inputs.elements["p2y"].value);
+        let m1 = Number(inputs.elements["p1m"].value);
+        let m2 = totalPlanetMass - m1;
+        spaceship.boostsRemaining = totalBoosts;
+        if(x1 < 0 || x1 > canvas.width){
+            found = false;
+            alert("Wrong planet 1 X coordinate");
+        }
+        if(y1 < 0 || y1 > canvas.height){
+            found = false;
+            alert("Wrong planet 1 Y coordinate");
+        }
+        if(x2 < 0 || x2 > canvas.width){
+            found = false;
+            alert("Wrong planet 2 X coordinate");
+        }
+        if(y2 < 0 || y2 > canvas.height){
+            found = false;
+            alert("Wrong planet 2 Y coordinate");
+        }
+        if(m1 < 1 || m1 > totalPlanetMass - 1){
+            found = false;
+            alert("Wrong planet 1 mass");
+        }
+        if(found) {;
+            planet1.position.x = x1;
+            planet1.position.y = y1;
+            planet2.position.x = x2;
+            planet2.position.y = y2;
+            planet1.mass = m1;
+            planet2.mass = m2;
+        }
+    }
+    let ang = Number(inputs.elements["ang"].value);
+    if(ang < -90 || ang > 90){
+        found = false;
+        alert("Wrong angle");
+    }
+    if(found) {
+        //alert(spaceship.angle);
+        //spaceship.angle = (Math.PI / 180) * ang;
+        //alert(spaceship.angle);
+        spaceship.velocity.x = spaceship.speed * Math.sin(spaceship.angle);
+        spaceship.velocity.y = -spaceship.speed * Math.cos(spaceship.angle);
+        spaceship.numFirings++;
+    }
+    return found;
 }
 function drawBackground()
 {
@@ -323,9 +368,12 @@ function drawBackground()
 }
 function start()
 {
-    goodToGo = true;
-    init();
-    draw();
+    if(goodToGo == false)
+    {
+        goodToGo = init()
+        if(goodToGo)
+            draw();
+    }
 }
 function draw()
 {
