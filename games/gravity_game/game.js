@@ -46,7 +46,7 @@ var spaceship =
         y: initPosition.y
     },
     speed: spaceshipSpeed,
-    angle: 0,//Math.random() * Math.PI - Math.PI / 2,
+    angle: Math.random() * Math.PI - Math.PI / 2,
     velocity:
     {
         x: 0,
@@ -211,6 +211,8 @@ function drawSpaceship()
         context.closePath();
     }
     context.restore();
+    context.rotate(-spaceship.angle);
+    context.translate(-Math.floor(spaceship.position.x), - Math.floor(spaceship.position.y));
 }
 function updateAccelaration()
 {
@@ -350,9 +352,7 @@ function init(){
         alert("Wrong angle");
     }
     if(found) {
-        //alert(spaceship.angle);
-        //spaceship.angle = (Math.PI / 180) * ang;
-        //alert(spaceship.angle);
+        spaceship.angle = (Math.PI / 180) * ang;
         spaceship.velocity.x = spaceship.speed * Math.sin(spaceship.angle);
         spaceship.velocity.y = -spaceship.speed * Math.cos(spaceship.angle);
         spaceship.numFirings++;
@@ -378,8 +378,6 @@ function start()
 function draw()
 {
     // Clear entire screen
-    context.rotate(-spaceship.angle);
-    context.translate(-Math.floor(spaceship.position.x), - Math.floor(spaceship.position.y));
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.drawImage(background,0,0);
     drawTarget();
