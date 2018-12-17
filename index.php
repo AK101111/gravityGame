@@ -23,6 +23,7 @@ jQuery(document).ready(function($) {
             <ul>
                 <li><a href="">Home</a></li>
             </ul>
+            
         </nav>
         <article>
             <h1 id="gameName"></h1>
@@ -30,9 +31,16 @@ jQuery(document).ready(function($) {
             <div id="gameDesc"></div>
             <h4>Instructions:</h4>
             <div class="jumbotron">
-                <p>In this game, one side (the seeker) tries to send a projectile to a target in a known location but in an unknown gravitational field. The hider gets to place two planets of a certain total weight of 1000 in any location the hider wants. Then the seeker has 5 chances to shoot a projectile from a certain location but at any velocity (such that the total speed is 10). The hider also has 1 chance to shoot a projectile from that same location under the same speed constraint. In a game, each player plays both the hider and the seeker. Score of each player P is the closest distance to the target when P is the hider + cloest distance to the target when P is the seeker. The winner has the lowest score.</p>
-                <p>The game is played entirely with the mouse. You will click to select planet size (split is determined by mouse horizontal position) as well as to place the planets themselves and to launch your spaceship.</p>
-                <p>If you would like to take turns playing against an AI which will place planets in the same places game-over-game, supply the same random seed and mode values across multiple games.</p>
+                <p> <b>1v1 Play: Play both as Hider and Seeker. </b></p>
+                <p> (Both players want to) Hit the target (as close as possible) while dogding the planets! </p>
+                <p> Round 1. P1 (Hider) vs P2(Seeker) 
+                <ul>
+                    <li>P1 selects location of planets [and press submit]</li>
+                    <li>P2 selects angle of fire [submit], gets 5 turns (planets hidden)</li>
+                    <li>P1 selects angle of fire [submit], gets 5 turns (planets visible)</li>
+                    <li>(Both players) can use one boost each</li>
+                </ul>
+                <p>Round 2. P2(Hider) vs P1(Seeker) </p>
             </div>
             <h4>Leaderboard:</h4>
             <div id="scoreArea", class="jumbotron">
@@ -44,12 +52,11 @@ jQuery(document).ready(function($) {
         <?php include $base."footer.php"; ?>
     </div>
     <script type="text/javascript">
-        initInfo("Gravity Game", "Team Reptar", "");
-        var modeChoices = ['PvP','PvAI'];
+        initInfo("Space Wars", "Team Greedy God", "");
+        var modeChoices = ['PvP'];
         newSelect('Game Mode',modeChoices,'modeSelect');
         newTextBox('AI Placement Seed (blank for random)','seed');
-        newWindowBtn(screen.availWidth, screen.availHeight,"games/gravity_game/game.html", ['modeSelect', 'seed']);
+        newWindowBtn(screen.availWidth, screen.availHeight,"game.html", ['modeSelect', 'seed']);
     </script>
 </body>
 </html>
-

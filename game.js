@@ -13,6 +13,7 @@ var context = canvas.getContext("2d");
 var background = new Image();
 var numRounds = 5
 var goodToGo = 0
+var planetNum = 0
 background.src = "./photos/galaxy.png";
 // Make sure the image is loaded first otherwise nothing will draw.
 background.onload = function(){
@@ -130,14 +131,79 @@ function drawTarget()
     context.restore();
 }
 var planets = [ planet1, planet2]
-var colors = ["rgb(255,255,0)", "rgb(255,215,0)", "rgb(255,165,0)", "rgb(255,140,0)", "rgb(255,69,0)", "rgb(0,0,0)"]
+var colors = ["rgb(255,255,0)", "rgb(255,215,0)", "rgb(255,165,0)", "rgb(255,140,0)", "rgb(255,69,0)"]
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
 // when a planet is hit, it will keep burning and be visible till certain period of time within a game. if player starts a new part game, the burning planet might still be visible for the player to see the location of the planet.
-function drawPlanets()
+
+function erasePlanets(planetIndex)
 {
-    
+        if(planetIndex == 1){
+            var planet = planets[planetIndex];
+            context.save();
+            context.beginPath();
+            context.arc(
+            planet1.position.x,
+            planet1.position.y,
+            planet1.radius,
+            0, 2 * Math.PI);
+            context.stroke();
+            context.fillStyle = "rgb(27,25,27)";
+            context.fill();
+            context.closePath();
+            context.restore();
+        }
+       if(planetIndex == 2){
+            var planet = planets[planetIndex];
+            context.save();
+            context.beginPath();
+            context.arc(
+            planet2.position.x,
+            planet2.position.y,
+            planet2.radius,
+            0, 2 * Math.PI);
+            context.stroke();
+            context.fillStyle = "rgb(27,25,27)";
+            context.fill();
+            context.closePath();
+            context.restore();
+        }
+}
+function drawPlanets(planetIndex)
+{
+        if(planetIndex == undefined)
+            planetIndex = 0;
+        if(planetIndex == 1){
+            var planet = planets[planetIndex];
+            context.save();
+            context.beginPath();
+            context.arc(
+            planet1.position.x,
+            planet1.position.y,
+            planet1.radius,
+            0, 2 * Math.PI);
+            context.stroke();
+            context.fillStyle = "blue";
+            context.fill();
+            context.closePath();
+            context.restore();
+        }
+       if(planetIndex == 2){
+            var planet = planets[planetIndex];
+            context.save();
+            context.beginPath();
+            context.arc(
+            planet2.position.x,
+            planet2.position.y,
+            planet2.radius,
+            0, 2 * Math.PI);
+            context.stroke();
+            context.fillStyle = "green";
+            context.fill();
+            context.closePath();
+            context.restore();
+        }
 	for(index in planets){
         context.save();
         context.beginPath();
@@ -248,47 +314,83 @@ function showResult(){
     // wait for player to give velocity
     // update velocity
     if(spaceship.numFirings <= numRounds)
-        document.getElementById("p2ScoreSeeker").innerHTML =  player2.seekScore;
+        document.getElementById("outputs").elements["p2ScoreSeeker"].value = player2.seekScore;
     else if(spaceship.numFirings <= 2 * numRounds)
-        document.getElementById("p1ScoreHider").innerHTML = player1.hideScore;
+        document.getElementById("outputs").elements["p1ScoreHider"].value = player1.hideScore;
     else if(spaceship.numFirings <= 3 * numRounds)
-        document.getElementById("p1ScoreSeeker").innerHTML = player1.seekScore;
+        document.getElementById("outputs").elements["p1ScoreSeeker"].value = player1.seekScore;
     else
-        document.getElementById("p2ScoreHider").innerHTML = player2.hideScore;
+        document.getElementById("outputs").elements["p2ScoreHider"].value = player2.hideScore;
 }
 function declareResults(){
     if(player1.hideScore + player1.seekScore > player2.hideScore + player2.seekScore){
         alert('The game has ended. Player 2 won.');
-        $.get("../../dbman/saveScore.php", {gamename:"Gravity", playername:"player 2", score:player2.hideScore + player2.seekScore});
+        
     }
     else if(player1.hideScore + player1.seekScore < player2.hideScore + player2.seekScore){
         alert('The game has ended. Player 1 won.');
-        $.get("../../dbman/saveScore.php", {gamename:"Gravity", playername:"player 1", score:player1.hideScore + player1.seekScore});
+        
     }else{
         alert('The game has ended. Game drawn.');
     }
 }
 function statusUpdate(){
-    document.getElementById("roundNumber").innerHTML = "Round:" + ((spaceship.numFirings) % numRounds + 1).toString();
+    document.getElementById("statusF").elements["roundNumber"].value = ((spaceship.numFirings) % numRounds + 1);
+    
+    switch(spaceship.numFirings) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            document.getElementById("statusB").innerHTML = "Player 2 adjust angle, press submit";
+            break;
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+            document.getElementById("statusB").innerHTML = "Player 1 adjust angle, press submit";
+            break;
+        case 10:
+            document.getElementById("statusB").innerHTML = "Player 2 place planets and press submit";
+            break;
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+            document.getElementById("statusB").innerHTML = "Player 1 adjust angle, press submit";
+            break;
+        case 15:
+        case 16:
+        case 17:
+        case 18:
+        case 19:
+        case 20:
+            document.getElementById("statusB").innerHTML = "Player 2 adjust angle, press submit";
+            break;   
+    }
+
+    
     if(spaceship.numFirings <= numRounds){
-        document.getElementById("status1").innerHTML = "Player 1: Hider";
-        document.getElementById("status2").innerHTML = "Player 2: Seeker";
-        document.getElementById("status").innerHTML = "Spaceship Captain: Player 2";
+        document.getElementById("statusF").elements["status1"].value = "Hider";
+        document.getElementById("statusF").elements["status2"].value = "Seeker";
+        document.getElementById("statusF").elements["status"].value = "Player 2";
     }
     else if(spaceship.numFirings <= 2 * numRounds){
-        document.getElementById("status1").innerHTML = "Player 1: Hider";
-        document.getElementById("status2").innerHTML = "Player 2: Seeker";
-        document.getElementById("status").innerHTML = "Spaceship Captain:Player 1";
+        document.getElementById("statusF").elements["status1"].value = "Hider";
+        document.getElementById("statusF").elements["status2"].value = "Seeker";
+        document.getElementById("statusF").elements["status"].value = "Player 1";
     }
     else if(spaceship.numFirings <= 3 * numRounds){
-        document.getElementById("status1").innerHTML = "Player 1: Seeker";
-        document.getElementById("status2").innerHTML = "Player 2: Hider";
-        document.getElementById("status").innerHTML = "Spaceship Captain:Player 1";
+        document.getElementById("statusF").elements["status1"].value = "Seeker";
+        document.getElementById("statusF").elements["status2"].value = "Hider";
+        document.getElementById("statusF").elements["status"].value = "Player 1";
     }
     else{
-        document.getElementById("status1").innerHTML = "Player 1: Seeker";
-        document.getElementById("status2").innerHTML = "Player 2: Hider";
-        document.getElementById("status").innerHTML = "Spaceship Captain:Player 2";
+        document.getElementById("statusF").elements["status1"].value = "Seeker";
+        document.getElementById("statusF").elements["status2"].value = "Hider";
+        document.getElementById("statusF").elements["status"].value = "Player 2";
     }
 }
 function resetPartGame(hitTarget){
@@ -349,6 +451,7 @@ function updateSpaceship()
         spaceship.position.x = 10000;
     }
     for(index in planets){
+    	document.getElementById("inputs").elements["p2y"].value = planet2.position.y;
         var planet = planets[index];
         if(distance(planet.position, spaceship.position) <= planet.radius){
             if(spaceship.position.x < 9000)
@@ -370,6 +473,7 @@ function init(){
     }
     if(spaceship.numFirings % (2 * numRounds) == 0 && goodToGo == 0)
     {
+        planetNum = 0;
         let x1 = Number(inputs.elements["p1x"].value);
         let y1 = Number(inputs.elements["p1y"].value);
         let x2 = Number(inputs.elements["p2x"].value);
@@ -398,11 +502,11 @@ function init(){
             found = 0;
             alert("Wrong planet 1 mass");
         }
-        if(found) {;
-            planet1.position.x = x1;
-            planet1.position.y = y1;
-            planet2.position.x = x2;
-            planet2.position.y = y2;
+        if(found) {
+            //planet1.position.x = x1;
+            //planet1.position.y = y1;
+            //planet2.position.x = x2;
+            //planet2.position.y = y2;
             planet1.mass = m1;
             planet2.mass = m2;
             inputs.elements["p1x"].value = "";
@@ -415,17 +519,19 @@ function init(){
             inputs.elements["p2y"].disabled = true;
             inputs.elements["p1m"].value = "";
             inputs.elements["p1m"].disabled = true;
+            document.getElementById("statusB").innerHTML = "Player 2 adjust angle, press submit";
             return 1;
         }
     }
     let ang = Number(inputs.elements["ang"].value);
-    if(ang < -90 || ang > 90){
+    if(isNaN(ang) || (ang < -90 || ang > 90)){
         found = 1;
         alert("Wrong angle");
     }
     if(found == 2) {
         inputs.elements["ang"].disabled = true;
         spaceship.angle = (Math.PI / 180) * ang;
+        inputs.elements["ang"].value = "";
         spaceship.velocity.x = spaceship.speed * Math.sin(spaceship.angle);
         spaceship.velocity.y = -spaceship.speed * Math.cos(spaceship.angle);
         spaceship.numFirings++;
@@ -444,6 +550,14 @@ function start()
     if(goodToGo != 2)
     {
         goodToGo = init()
+        if(goodToGo == 1){
+            // clear screen
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(background,0,0);
+            drawTarget();
+            drawPlanets();
+            drawSpaceship();
+        }
         if(goodToGo == 2)
             draw();
     }
@@ -458,8 +572,9 @@ function draw()
     updateSpaceship();
     // Begin drawing
     drawSpaceship();
-    if(goodToGo)
+    if(goodToGo){
         requestAnimationFrame(draw);
+    }
 }
 function boost()
 {
@@ -472,5 +587,73 @@ function boost()
         spaceship.boost = true;
         spaceship.boostTime = 0;
         document.getElementById("boosts").innerHTML = --spaceship.boostsRemaining;
+    }
+}
+//document.addEventListener("click", assignPlanets, true);
+function assignPlanets(event){
+    if(spaceship.numFirings % (2 * numRounds) == 0  && goodToGo == 0){
+        planetNum++;
+        if(planetNum == 1){
+    	    planet1.position.x = document.getElementById("inputs").elements["p1x"].value;
+    	    planet1.position.y = document.getElementById("inputs").elements["p1y"].value;
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(background,0,0);
+            drawPlanets(1);
+            drawTarget();
+            drawSpaceship();
+        }
+        if(planetNum == 2){
+     	    planet2.position.x = document.getElementById("inputs").elements["p2x"].value;
+    	    planet2.position.y = document.getElementById("inputs").elements["p2y"].value;
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(background,0,0);
+            drawPlanets(1);
+            drawPlanets(2);
+            drawTarget();
+            drawSpaceship();
+        }
+        //drawPlanets(planetNum);
+    }
+}
+function setPlanets(event){
+    if(goodToGo == 0 && spaceship.numFirings % (2 * numRounds) == 0){
+    if(planetNum == 0){
+    	document.getElementById("inputs").elements["p1x"].value = event.offsetX;
+    	document.getElementById("inputs").elements["p1y"].value = event.offsetY;
+        //drawPlanets(1);
+    }
+    if(planetNum == 1){
+        document.getElementById("inputs").elements["p2x"].value = event.offsetX;
+    	document.getElementById("inputs").elements["p2y"].value = event.offsetY;
+     //   drawPlanets(2);
+    }}
+    //drawPlanets(planetNum);
+}
+
+function drawPlanetsUpdate(num){
+    if(goodToGo == 0 && spaceship.numFirings % (2 * numRounds) == 0){
+    if(num == 1){
+        planet1.position.x = document.getElementById("inputs").elements["p1x"].value;
+        planet1.position.y = document.getElementById("inputs").elements["p1y"].value;
+    }
+    if(num == 2){
+        planet2.position.x = document.getElementById("inputs").elements["p2x"].value;
+        planet2.position.y = document.getElementById("inputs").elements["p2y"].value;
+    }
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(background,0,0);
+    drawPlanets(1);
+    drawPlanets(2);
+    drawTarget();
+    drawSpaceship();
+    }
+}
+
+function recalibSpaceship(nn){
+    if(goodToGo <= 1){spaceship.angle = Math.PI/180 * Number(document.getElementById("inputs").elements["ang"].value);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(background,0,0);
+    drawTarget();
+    drawSpaceship();
     }
 }

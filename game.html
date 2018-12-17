@@ -1,0 +1,154 @@
+<!-- Arnav Kansal arnav.kansal@nyu.edu -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Game Greedy God</title>
+    <style>
+        * { padding: 0; margin: 0; }
+        canvas { background: #eee; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+<!--canvas id="game" width="600" height="600" onclick="assignPlanets(event)"></canvas-->
+<canvas id="game" width="550" height="550" onmousemove="setPlanets(event)" onclick="assignPlanets(event)"></canvas>
+<script src="game.js"></script>
+
+<style>
+        canvas { 
+           position: relative; 
+                z-index: 100;
+                }
+        *{margin: 0; padding: 0;}
+        body{background: #ecf1f4; font-family: sans-serif;}
+        .form-wrap{ width: 240px; background: #3e3d3d; padding: 40px 20px; box-sizing: border-box; position: fixed; left: 15%; top: 55%; transform: translate(-60%, -60%);}
+        .form-wrap2{ width: 240px; background: #3e3d3d; padding: 40px 20px; box-sizing: border-box; position: fixed; left: 85%; top: 30%; transform: translate(-60%, -60%);}
+        .form-wrap3{ width: 240px; background: #3e3d3d; padding: 10px 10px; box-sizing: border-box; position: fixed; left: 85%; top: 80%; transform: translate(-60%, -60%);}
+        h1{text-align: center; color: #fff; font-weight: normal; margin-bottom: 10px;}
+        
+        input{width: 100%; background: none; border: 1px solid #fff; border-radius: 3px; padding: 6px 15px; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; color: #fff;}
+        
+        input[type="button"]{ background: #ffffff; border: 0; cursor: pointer; color: #000000;}
+        input[type="button"]:hover{ background: #ffffff; transition: .6s;}
+        
+        ::hidden{color: #fff;}
+        .players {
+            padding-left:90px;
+            width:800px;left: 15%; top: 20%; transform: translate(100%, -150%);
+            padding-top:100px
+            position:fixed;
+            font-family: sans-serif;
+            z-index:-100;
+        }
+        .statusBB {
+            padding-left:90px;
+            width:800px; transform: translate(30%, 50%);
+            padding-top:100px
+            position:fixed;
+            font-family: sans-serif;
+            font-size:25px;
+            font-weight: bold;
+        }
+        .first-box {
+              z-index:-98;
+              width:250px; 
+              float:top; 
+                          background: #3e3d3d; 
+                                height: 50px;
+                                      margin: 50px
+
+        }
+
+        .first-box p {
+              color: #ffffff;
+                    padding-left: 0px;
+                          padding-top: 0px;
+                font-family: sans-serif;
+        }
+
+        .second-box {
+              z-index:-99;
+              width:250px; 
+                    height: 50px; 
+                          float:bottom; 
+                            background: #3e3d3d;
+                                      margin: 50px
+
+        }
+
+        .second-box p {
+              color: #ffffff;
+                    padding-left: 0px;
+                          padding-top: 0px;
+                              font-family: sans-serif;
+
+        }
+    </style>
+
+<body onLoad="drawBackground()">
+
+    <div class = "form-wrap">        
+        <FORM id="inputs">
+            <h1> Hider Inputs </h1>
+            <font color="#c0c0c0">planet1 pos x (0 to 550): </font><input id="p1x" name="p1x" type="number" min="0" max="550" size="30" value=100 oninput="drawPlanetsUpdate(1)"> </br>
+            <font color="#c0c0c0">planet1 pos y (0 to 550): </font><input id="p1y" name="p1y" type="number" min="0" max="550" size="30" value=100 oninput="drawPlanetsUpdate(1)"> </br>
+            <font color="#c0c0c0">planet1 mass (1 to 999): </font><input name="p1m" type="number" min="1" max="999" size="30" value=500 ></br>
+            <font color="#c0c0c0">planet2 pos x (0 to 550): </font><input id="p2x" name="p2x" type="number" min="0" max="550" size="30" value=300 oninput="drawPlanetsUpdate(2)"> </br>
+            <font color="#c0c0c0">planet2 pos y (0 to 550): </font><input id="p2y" name="p2y" type="number" min="0" max="550" size="30" value=300 oninput="drawPlanetsUpdate(2)"></br>
+            <h1> Player Inputs </h1>
+            <font color="#c0c0c0">Spaceship Angle (-90 to 90): </font><input name="ang" type="number" min="-90" max="90" size="30" value=30 oninput="recalibSpaceship(0)"> </br>
+        </FORM>
+        <input type="button" value="Submit" onclick="start()">
+        <input type="button" value="Boost" onclick="boost()"> </br>
+        <font color="#c0c0c0"> Boosts Remaining: <p id = "boosts"> 1 </p> </font>
+    </div>
+    
+     <div class = "form-wrap2">        
+        <FORM id="outputs">
+            <h1> Scoreboard </h1>
+            <font color="#c0c0c0">Player 1 Hider Score</font><input id="p1ScoreHider" name="p1h" size="30"> </br>
+            <font color="#c0c0c0">Player 1 Seeker Score</font><input id="p1ScoreSeeker" name="p1s" size="30"> </br>
+            <font color="#c0c0c0">Player 2 Hider Score</font><input id="p2ScoreHider" name="p2h" size="30"> </br>
+            <font color="#c0c0c0">Player 2 Seeker Score</font><input id="p2ScoreSeeker" name="p2s" size="30"> </br>
+        </FORM>
+    </div>
+
+    <!--div class="players">
+        <div class="first-box"> 
+            <font size=2>
+            <font color="#c0c0c0">
+            <h2>Player 1 Score (Hider)</h2></font>
+            <p id="p1ScoreHider"> - </p>
+        </div>
+        <div class="first-box">
+            <font color="#c0c0c0">
+            <h2>Player 1 Score (Seeker)</h2></font>
+            <p id="p1ScoreSeeker"> - </p>
+        </div>
+        <div class="second-box">
+            <font color="#c0c0c0">
+            <h2>Player 2 Score (Hider)</h2></font>
+            <p id="p2ScoreHider"> - </p>
+            </div>
+        <div class="first-box"> 
+            <font color="#c0c0c0">
+            <h2>Player 2 Score (Seeker)</h2></font>
+            <p id="p2ScoreSeeker"> - </p>
+        </font>
+        </div>
+        </div-->
+    <div class = "form-wrap3">
+    <h1> Status </h1>
+             <FORM id="statusF">
+                 <font color="#c0c0c0">Round: </font><input id="roundNumber" size="10" value="1"> </br>
+                 <font color="#c0c0c0">Player 1: </font><input id="status1" size="20" value="Hider"> </br>
+                 <font color="#c0c0c0">Player 2: </font><input id="status2" size="20" value="Seeker"> </br>
+                 <font color="#c0c0c0">Spaceship captain: </font><input id="status" value="Player2" size="30"> </br>
+             </FORM>
+    </div>
+    <div class ="statusBB">
+       <p id="statusB"> Player 1 select: (both) planet positions, <br> Press submit</p> 
+   </div>
+
+</body>
+</html>
